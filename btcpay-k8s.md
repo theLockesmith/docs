@@ -5,8 +5,15 @@
 Generate your docker compose file:
 `. ./btcpay-setup.sh --install-only`
 
+## Use Kompose to generate manifests
+
 Ensure environment variables used in the compose file are accessible and use kompose to generate manifests:
-`set -a && source .env && set +a && kompose convert -f docker-compose.generated.yml` ***There are some instances where the same volume is mounted twice. You'll need to change the volume name of one or both of those instances in order for kompose to succeed.*** Here is RTL as an example:
+
+`set -a && source .env && set +a && kompose convert -f docker-compose.generated.yml`
+
+***There are some instances where the same volume is mounted twice. You'll need to change the volume name of one or both of those instances in order for kompose to succeed.***
+
+Here is RTL as an example:
 ```
     volumes:
     - "bitcoin_datadir:/etc/bitcoin"
@@ -16,7 +23,7 @@ Ensure environment variables used in the compose file are accessible and use kom
     - "lnd_bitcoin_rtl_datadir:/data"
 ```
 
-For example, you could change the `lnd_bitcoin_datadir` volumes to `lnd_bitcoin_datadir_etc` and `lnd_bitcoin_datadir_root`:
+You would change the `lnd_bitcoin_datadir` volumes to something like `lnd_bitcoin_datadir_etc` and `lnd_bitcoin_datadir_root`:
 ```
     volumes:
     - "bitcoin_datadir:/etc/bitcoin"
@@ -26,10 +33,7 @@ For example, you could change the `lnd_bitcoin_datadir` volumes to `lnd_bitcoin_
     - "lnd_bitcoin_rtl_datadir:/data"
 ```
 
-If you have to do this, make sure to revert the change in the manifest of the corresponding deployment. If you do not, you are likely to encounter a pod that will remaind stuck in a `ContainerCreating` state with no events or logs to guide you.
-
-
-
+If you have to do this, make sure to revert the change in the manifest of the corresponding deployment. If you do not, you are likely to encounter a pod that will remain stuck in a `ContainerCreating` state with no events or logs to guide you.
 
 ## Clean up manifests
 
@@ -69,6 +73,11 @@ spec:
 
 1. Remove your SSH environment variables from the btcpayserver deployment. Since this is not a typical docker deployment, any communication with the host from the container is pointless.
 2. Add your SSH key and authorized_keys as a secret. (Unless you plan to use the configurator, this is pointless.)
+
+---
+# You are technically done here
+
+While this guide contains some more helpful information; at a bare minimum for conversion to kubernetes, you are done! The next section will go over access via tor and cloudflared. Access via ingress is outside the scope of this document.
 
 ## Cloudflared
 If you want to user cloudflared, you have 2 options:
